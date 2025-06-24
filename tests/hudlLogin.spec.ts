@@ -1,11 +1,20 @@
 import { test, expect } from '@playwright/test';
 
+//pull these into their own files so they can be used globally
+//import { login } from '../helpers/login';
+//import { selectors } from '../selectors/login';
+
 const hudlUrl = 'https://www.hudl.com/';
 const headerLoginBtn = '[data-qa-id="login-select"]';
 const dropdownLoginBtn = '[data-qa-id="login-hudl"]';
 const googleBtn = '[data-provider="google"]';
 const facebookBtn = '[data-provider="facebook"]';
 const appleBtn = '[data-provider="apple"]';
+const editUn = '[data-link-name="edit-username"]';
+const usernameInput = '[id="username"]';
+const passwordInput = '[id="password"]';
+const forgotPassBtn = '[a contains text Forgot Password]';
+const submitBtn = '[button[type="submit"]';
 
 async function goToLoginPage(page) {
   await page.goto(hudlUrl);
@@ -18,8 +27,29 @@ test.describe('happy path login', () => {
     await goToLoginPage(page);
   });
 
-  test('entering a correct username and password routes user to main page', async ({ page }) => {
-    await expect(page).toHaveURL(/login/);
+  test('entering a correct username reveals the password input and forgot password button', async ({ page }) => {
+    // expect password input
+    // expect forgot password button
+    // expect edit username button
+  });
+
+  test('entering a correct username and password directs user to homepage', async ({ page }) => {
+    // expect password input
+    // expect forgot password button
+  });
+});
+
+test.describe('reset password path', () => {
+  test.beforeEach(async ({ page }) => {
+    await goToLoginPage(page);
+  });
+
+  test('user can send a reset password email', async ({ page }) => {
+    // enter correct username
+    // click forgot password button
+    await expect(page).toHaveURL(/reset-password/);
+    // click go back
+    await expect(page).not.toHaveURL(/reset-password/);
   });
 });
 
@@ -29,11 +59,20 @@ test.describe('negative path login', () => {
   });
 
   test('entering an incorrect username shows an error', async ({ page }) => {
-    await expect(page).toHaveURL(/login/);
+    // enter a username that is NOT formatted as an email
+    //expect error message
+  });
+
+  test('entering an empty username shows an error', async ({ page }) => {
+    //expect error message
   });
 
   test('entering an incorrect password shows an error', async ({ page }) => {
-    await expect(page).toHaveURL(/login/);
+    //expect error message
+  });
+
+  test('entering an empty password shows an error', async ({ page }) => {
+    //expect error message
   });
 });
 
