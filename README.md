@@ -15,6 +15,6 @@ A Hudl Coach account has been created on a test team. Set up automation using ei
 6. Install Playwright: ```npm init playwright@latest```
 
 ## Running the Tests
-There are two ways to run tests in Playwright: headless (tests are run with no visual, this is typically faster) and headed (a GUI opens so the engineer can see what actions the automation is performing). 
-* To run the tests in the command line, run: ```npm playwright test```
-* To run the tests with GUI, run: ```npm playwright test --ui```
+There are two ways to run tests in Playwright: headless (tests are run with no visual, this is typically faster) and headed (a GUI opens so the engineer can see what actions the automation is performing). To login with credentials, we need to send the username and password in these commands so we avoid hardcoding them. Please replace the brackets with valid strings.
+* To run the tests in the command line, run: ```USERNAME=[usernamehere] PASSWORD=[passwordhere] npx playwright test```
+* To run the tests with GUI, run: ```USERNAME=[usernamehere] PASSWORD=[passwordhere] npx playwright test --ui```
