@@ -15,11 +15,15 @@ const usernameInput = '[id="username"]';
 const passwordInput = '[id="password"]';
 const forgotPassBtn = '[a contains text Forgot Password]';
 const submitBtn = '[button[type="submit"]';
+// these two are sent in the CLI when the tests are run. See README for more info.
+const usernameString = process.env.USERNAME;
+const passwordString = process.env.PASSWORD;
 
 async function goToLoginPage(page) {
   await page.goto(hudlUrl);
   await page.locator(headerLoginBtn).click();
   await page.locator(dropdownLoginBtn).click();
+  await page.waitForNavigation();
 }
 
 test.describe('happy path login', () => {
