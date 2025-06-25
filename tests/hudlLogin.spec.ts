@@ -35,6 +35,7 @@ test.describe('reset password path', () => {
 
   test('user can send a reset password email', async ({ page }) => {
     await page.locator(selectors.usernameInput).fill(usernameString ?? '');
+    await page.getByRole('button', { name: 'Continue', exact: true }).click();
     await page.getByRole('link', { name: 'Forgot Password' }).click();
     await expect(page).toHaveURL(/reset-password/);
     await page.locator(selectors.goBackBtn).click();
@@ -50,8 +51,7 @@ test.describe('negative path login', () => {
   test('entering an incorrect username shows an error', async ({ page }) => {
     await page.locator(selectors.usernameInput).fill("notAnEmail@gmail");
     await page.getByRole('button', { name: 'Continue', exact: true }).click();
-    // no error message is shown, but the password input should not be visible
-    await expect(page.locator(selectors.passwordInput)).not.toBeVisible();
+    await expect(page.getByText('Enter a valid email.')).toBeVisible();
   });
 
   test('entering an empty username shows an error', async ({ page }) => {
@@ -59,6 +59,7 @@ test.describe('negative path login', () => {
     await page.getByRole('button', { name: 'Continue', exact: true }).click();
     // no error message is shown, but the password input should not be visibl
     await expect(page.locator(selectors.passwordInput)).not.toBeVisible();
+    await expect(page).toHaveURL(/login/);
   });
 
   test('entering an incorrect password shows an error', async ({ page }) => {
@@ -80,13 +81,18 @@ test.describe('negative path login', () => {
   });
 });
 
-test.describe('create account path', () => {
+test.describe('create account', () => {
   test.beforeEach(async ({ page }) => {
     await goToLoginPage(page);
   });
 
-  test('placeholder test', async ({ page }) => {
-    await expect(page).toHaveURL(/login/);
+  test('can navigate to create account page', async ({ page }) => {
+    await page.getByRole('link', { name: 'Create Account' }).click();
+    await expect(page).toHaveURL(/signup/);
+    await expect(page.locator(selectors.updateUserFirst)).toBeVisible();
+    await expect(page.locator(selectors.updateUserLast)).toBeVisible(); 
+    await expect(page.locator(selectors.updateUserEmail)).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Continue', exact: true })).toBeVisible();
   });
 });
 
