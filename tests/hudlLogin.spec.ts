@@ -1,30 +1,10 @@
 import { test, expect } from '@playwright/test';
+import { goToLoginPage } from '../functions/login';
+import { selectors } from '../selectors/login';
 
-//pull these into their own files so they can be used globally
-//import { login } from '../helpers/login';
-//import { selectors } from '../selectors/login';
-
-const hudlUrl = 'https://www.hudl.com/';
-const headerLoginBtn = '[data-qa-id="login-select"]';
-const dropdownLoginBtn = '[data-qa-id="login-hudl"]';
-const googleBtn = '[data-provider="google"]';
-const facebookBtn = '[data-provider="facebook"]';
-const appleBtn = '[data-provider="apple"]';
-const editUn = '[data-link-name="edit-username"]';
-const usernameInput = '[id="username"]';
-const passwordInput = '[id="password"]';
-const forgotPassBtn = '[a contains text Forgot Password]';
-const submitBtn = '[button[type="submit"]';
 // these two are sent in the CLI when the tests are run. See README for more info.
 const usernameString = process.env.USERNAME;
 const passwordString = process.env.PASSWORD;
-
-async function goToLoginPage(page) {
-  await page.goto(hudlUrl);
-  await page.locator(headerLoginBtn).click();
-  await page.locator(dropdownLoginBtn).click();
-  await page.waitForNavigation();
-}
 
 test.describe('happy path login', () => {
   test.beforeEach(async ({ page }) => {
@@ -32,14 +12,19 @@ test.describe('happy path login', () => {
   });
 
   test('entering a correct username reveals the password input and forgot password button', async ({ page }) => {
-    // expect password input
-    // expect forgot password button
-    // expect edit username button
+    await page.locator(selectors.usernameInput).fill(usernameString ?? '');
+    await page.getByRole('button', { name: 'Continue', exact: true }).click();
+    await expect(page.locator(selectors.passwordInput)).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Forgot Password' })).toBeVisible();
+    await expect(page.locator(selectors.editUn)).toBeVisible();
   });
 
   test('entering a correct username and password directs user to homepage', async ({ page }) => {
-    // expect password input
-    // expect forgot password button
+    await page.locator(selectors.usernameInput).fill(usernameString ?? '');
+    await page.getByRole('button', { name: 'Continue', exact: true }).click();
+    await page.locator(selectors.passwordInput).fill(passwordString ?? '');
+    await page.getByRole('button', { name: 'Continue', exact: true }).click();
+    await expect(page).toHaveURL(/home/);
   });
 });
 
@@ -49,10 +34,10 @@ test.describe('reset password path', () => {
   });
 
   test('user can send a reset password email', async ({ page }) => {
-    // enter correct username
-    // click forgot password button
+    await page.locator(selectors.usernameInput).fill(usernameString ?? '');
+    await page.getByRole('link', { name: 'Forgot Password' }).click();
     await expect(page).toHaveURL(/reset-password/);
-    // click go back
+    await page.locator(selectors.goBackBtn).click();
     await expect(page).not.toHaveURL(/reset-password/);
   });
 });
@@ -63,20 +48,35 @@ test.describe('negative path login', () => {
   });
 
   test('entering an incorrect username shows an error', async ({ page }) => {
-    // enter a username that is NOT formatted as an email
-    //expect error message
+    await page.locator(selectors.usernameInput).fill("notAnEmail@gmail");
+    await page.getByRole('button', { name: 'Continue', exact: true }).click();
+    // no error message is shown, but the password input should not be visible
+    await expect(page.locator(selectors.passwordInput)).not.toBeVisible();
   });
 
   test('entering an empty username shows an error', async ({ page }) => {
-    //expect error message
+    await page.locator(selectors.usernameInput).fill('');
+    await page.getByRole('button', { name: 'Continue', exact: true }).click();
+    // no error message is shown, but the password input should not be visibl
+    await expect(page.locator(selectors.passwordInput)).not.toBeVisible();
   });
 
   test('entering an incorrect password shows an error', async ({ page }) => {
-    //expect error message
+    await page.locator(selectors.usernameInput).fill(usernameString ?? '');
+    await page.getByRole('button', { name: 'Continue', exact: true }).click();
+    await page.locator(selectors.passwordInput).fill('thisIsWrong');
+    await page.getByRole('button', { name: 'Continue', exact: true }).click();
+    await expect(page.getByText('Your email or password is')).toBeVisible();
   });
 
   test('entering an empty password shows an error', async ({ page }) => {
-    //expect error message
+    await page.locator(selectors.usernameInput).fill(usernameString ?? '');
+    await page.getByRole('button', { name: 'Continue', exact: true }).click();
+    await page.locator(selectors.passwordInput).fill('');
+    await page.getByRole('button', { name: 'Continue', exact: true }).click();
+    // no error message is shown, but the password input should be visible and URL should not change
+    await expect(page.locator(selectors.passwordInput)).toBeVisible();
+    await expect(page).toHaveURL(/login/);
   });
 });
 
@@ -96,17 +96,17 @@ test.describe('third party login', () => {
   });
 
   test('Login with Google', async ({ page }) => {
-    await page.locator(googleBtn).click();
+    await page.locator(selectors.googleBtn).click();
     await expect(page).toHaveURL(/google/);
   });
 
   test('Login with Facebook', async ({ page }) => {
-    await page.locator(facebookBtn).click();
+    await page.locator(selectors.facebookBtn).click();
     await expect(page).toHaveURL(/facebook/);
   });
 
   test('Login with Apple', async ({ page }) => {
-    await page.locator(appleBtn).click();
+    await page.locator(selectors.appleBtn).click();
     await expect(page).toHaveURL(/apple/);
   });
 });
@@ -129,6 +129,10 @@ test.describe('happy path login: mobile version', () => {
   });
 
   test('entering a correct username and password on a mobile screen size routes user to main page', async ({ page }) => {
-    await expect(page).toHaveURL(/login/);
+    await page.locator(selectors.usernameInput).fill(usernameString ?? '');
+    await page.getByRole('button', { name: 'Continue', exact: true }).click();
+    await page.locator(selectors.passwordInput).fill(passwordString ?? '');
+    await page.getByRole('button', { name: 'Continue', exact: true }).click();
+    await expect(page).toHaveURL(/home/);
   });
 });
