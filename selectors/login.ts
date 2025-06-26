@@ -1,5 +1,4 @@
 export const selectors = {
-    hudlUrl:'https://www.hudl.com/',
     headerLoginBtn:'[data-qa-id="login-select"]',
     dropdownLoginBtn:'[data-qa-id="login-hudl"]',
     googleBtn:'button[data-provider="google"]',
