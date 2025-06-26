@@ -6,24 +6,29 @@ import { selectors } from '../selectors/login';
 const usernameString = process.env.USERNAME;
 const passwordString = process.env.PASSWORD;
 
-test.describe('happy path login', () => {
+test.describe('Happy path login', () => {
   test.beforeEach(async ({ page }) => {
     await goToLoginPage(page);
   });
 
-  test('entering a correct username and password directs user to homepage', async ({ page }) => {
+  test('entering a correct username reveals the password input and forgot password button', async ({ page }) => {
     await page.locator(selectors.usernameInput).fill(usernameString ?? '');
     await page.getByRole('button', { name: 'Continue', exact: true }).click();
+    await expect(page.locator(selectors.passwordInput)).toBeVisible();
     await expect(page.getByRole('link', { name: 'Forgot Password' })).toBeVisible();
     await expect(page.locator(selectors.editUn)).toBeVisible();
-    
-    await page.locator(selectors.passwordInput).fill(passwordString ?? '');
+  });
+
+  test('entering a correct username and password directs user to homepage', async ({ page }) => {
+    await page.fill(selectors.usernameInput, usernameString);
+    await page.getByRole('button', { name: 'Continue', exact: true }).click();
+    await page.fill(selectors.passwordInput, passwordString);
     await page.getByRole('button', { name: 'Continue', exact: true }).click();
     await expect(page).toHaveURL(/home/);
   });
 });
 
-test.describe('reset password path', () => {
+test.describe('Reset password path', () => {
   test.beforeEach(async ({ page }) => {
     await goToLoginPage(page);
   });
@@ -38,7 +43,7 @@ test.describe('reset password path', () => {
   });
 });
 
-test.describe('negative path login', () => {
+test.describe('Negative path login', () => {
   test.beforeEach(async ({ page }) => {
     await goToLoginPage(page);
   });
@@ -76,7 +81,7 @@ test.describe('negative path login', () => {
   });
 });
 
-test.describe('create account', () => {
+test.describe('Create account', () => {
   test.beforeEach(async ({ page }) => {
     await goToLoginPage(page);
   });
@@ -91,7 +96,7 @@ test.describe('create account', () => {
   });
 });
 
-test.describe('third party login', () => {
+test.describe('Third party login', () => {
   test.beforeEach(async ({ page }) => {
     await goToLoginPage(page);
   });
@@ -113,7 +118,7 @@ test.describe('third party login', () => {
 });
 
 // nice to have tests:
-test.describe('happy path login: accessibility version', () => {
+test.describe('Happy path login: accessibility version', () => {
   test.beforeEach(async ({ page }) => {
     await goToLoginPage(page);
   });
@@ -122,7 +127,7 @@ test.describe('happy path login: accessibility version', () => {
     await page.locator(selectors.usernameInput).fill(usernameString ?? '');
     await page.keyboard.press('Tab');
     await page.keyboard.press('Enter');
-    await page.locator(selectors.passwordInput).fill(passwordString ?? '');
+    await page.getByLabel('Password').fill(passwordString ?? '');
     await page.keyboard.press('Tab');
     await page.keyboard.press('Tab');
     await page.keyboard.press('Tab');
@@ -131,7 +136,7 @@ test.describe('happy path login: accessibility version', () => {
   });
 });
 
-test.describe('happy path login: mobile version', () => {
+test.describe('Happy path login: mobile version', () => {
   test.use({ viewport: { width: 360, height: 740 } });
   test.beforeEach(async ({ page }) => {
     await goToLoginPage(page);
