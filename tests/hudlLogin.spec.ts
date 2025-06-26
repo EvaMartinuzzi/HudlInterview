@@ -9,19 +9,17 @@ const passwordString = process.env.PASSWORD;
 test.describe('Happy path login', () => {
   test.beforeEach(async ({ page }) => {
     await goToLoginPage(page);
+    await page.locator(selectors.usernameInput).fill(usernameString ?? '');
+    await page.getByRole('button', { name: 'Continue', exact: true }).click();
   });
 
   test('entering a correct username reveals the password input and forgot password button', async ({ page }) => {
-    await page.locator(selectors.usernameInput).fill(usernameString ?? '');
-    await page.getByRole('button', { name: 'Continue', exact: true }).click();
     await expect(page.locator(selectors.passwordInput)).toBeVisible();
     await expect(page.getByRole('link', { name: 'Forgot Password' })).toBeVisible();
     await expect(page.locator(selectors.editUn)).toBeVisible();
   });
 
   test('entering a correct username and password directs user to homepage', async ({ page }) => {
-    await page.fill(selectors.usernameInput, usernameString);
-    await page.getByRole('button', { name: 'Continue', exact: true }).click();
     await page.fill(selectors.passwordInput, passwordString);
     await page.getByRole('button', { name: 'Continue', exact: true }).click();
     await expect(page).toHaveURL(/home/);
@@ -84,10 +82,10 @@ test.describe('Negative path login', () => {
 test.describe('Create account', () => {
   test.beforeEach(async ({ page }) => {
     await goToLoginPage(page);
+    await page.getByRole('link', { name: 'Create Account' }).click();
   });
 
   test('can navigate to create account page', async ({ page }) => {
-    await page.getByRole('link', { name: 'Create Account' }).click();
     await expect(page).toHaveURL(/signup/);
     await expect(page.locator(selectors.updateUserFirst)).toBeVisible();
     await expect(page.locator(selectors.updateUserLast)).toBeVisible(); 
