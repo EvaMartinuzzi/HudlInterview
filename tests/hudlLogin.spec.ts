@@ -11,17 +11,12 @@ test.describe('happy path login', () => {
     await goToLoginPage(page);
   });
 
-  test('entering a correct username reveals the password input and forgot password button', async ({ page }) => {
-    await page.locator(selectors.usernameInput).fill(usernameString ?? '');
-    await page.getByRole('button', { name: 'Continue', exact: true }).click();
-    await expect(page.locator(selectors.passwordInput)).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Forgot Password' })).toBeVisible();
-    await expect(page.locator(selectors.editUn)).toBeVisible();
-  });
-
   test('entering a correct username and password directs user to homepage', async ({ page }) => {
     await page.locator(selectors.usernameInput).fill(usernameString ?? '');
     await page.getByRole('button', { name: 'Continue', exact: true }).click();
+    await expect(page.getByRole('link', { name: 'Forgot Password' })).toBeVisible();
+    await expect(page.locator(selectors.editUn)).toBeVisible();
+    
     await page.locator(selectors.passwordInput).fill(passwordString ?? '');
     await page.getByRole('button', { name: 'Continue', exact: true }).click();
     await expect(page).toHaveURL(/home/);
@@ -124,7 +119,15 @@ test.describe('happy path login: accessibility version', () => {
   });
 
   test('entering a correct username and password using only a keyboard routes user to main page', async ({ page }) => {
-    await expect(page).toHaveURL(/login/);
+    await page.locator(selectors.usernameInput).fill(usernameString ?? '');
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Enter');
+    await page.locator(selectors.passwordInput).fill(passwordString ?? '');
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Enter');
+    await expect(page).toHaveURL(/home/);
   });
 });
 
